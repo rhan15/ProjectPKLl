@@ -37,6 +37,7 @@ Route::prefix('user')->group(function () {
 Route::prefix('auth')->group(function () {
     Route::get('get-otp', [AuthController::class, 'getOtp']);
     Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
+    Route::post('register', [AuthController::class, 'register']);
 });
 
 

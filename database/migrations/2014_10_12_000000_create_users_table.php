@@ -19,7 +19,7 @@ return new class extends Migration
 
             $table->string('country_code');
             $table->string('phone_number')->unique();
-            $table->string('pin');
+            $table->string('pin')->nullable();
             $table->string('admin')->default(User::REGULAR_USER);
             $table->string('otp')->nullable();
             

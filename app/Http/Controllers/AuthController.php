@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Exists;
 use PHPUnit\Framework\MockObject\Api;
 
 class AuthController extends Controller
@@ -32,7 +33,16 @@ class AuthController extends Controller
             ]);
             return $this->showOne($user);
         } else {
+            
             // ! Need to handle when user not exist yet
+            $data['country_code'] = $request->country_code;
+            $data['phone_number'] = $request->phone_number;
+            $data['admin'] = User::REGULAR_USER;
+            $data['otp'] = User::generateOTP();
+            
+            $userr = User::create($data);
+ 
+            return $this->showOne($userr);
         }
     }
 
@@ -51,28 +61,43 @@ class AuthController extends Controller
             ->first();
 
         // dd($user);
+
+        if ($user->profile==null) {
+            return response('bisaaa');
+        }
+
+        // $relation = $user->relation()->exists();
+        // dd($relation);
+
+        // $relation = count($user->relation);
+        // dd($relation);
+
+        // if(!is_null($user->relation)) {
+        //   return response('mantap');
+        // }
+
+
         if ($user) {
             Auth::login($user);
             $authUser = Auth::user();
             $tokenResult = $authUser->createToken('Personal Access Token', []);
 
-            // ! Need to handle whether it's new or old user
+        //    ! Need to handle whether it's new or old user
 
             return response()->json([
                 'token' => $tokenResult->accessToken,
             ]);
         }
-
+        else {
+            return $this->errorResponse('Bandel kamu yaa sana pulang', 409);
+        }
         // ! Need to handle when user not exist
+
     }
 
     public function register(Request $request)
     {
         $rules = [
-            'country_code' => 'required|min:1',
-            'phone_number' => 'required|min:9|max:13',
-            'otp' => 'required|digits:6',
-            'pin' => 'required|digits:6|confirmed',
             'name' => 'required',
             'birth_date' => 'required|date',
             'gender' => 'required'
@@ -82,21 +107,15 @@ class AuthController extends Controller
         $this->validate($request, $rules);
         $data = $request->all();
 
-        $data['country_code'] = $request->country_code;
-        $data['phone_number'] = $request->phone_number;
-        $data['pin'] = bcrypt($request->pin);
-        $data['admin'] = User::REGULAR_USER;
-
-        $user = User::create($data);
-
         $user = auth()->user(); // gimana cara dapetin id usernya ko sedangkan usernya belum tebuat
-        $profile = Profile::create([
-            'name' => $request->name,
-            'birth_date' => $request->birth_date,
-            'gender' => $request->gender,
-            'user_id' => $user->id,
+        dd($user);
+        // $profile = Profile::create([
+        //     'name' => $request->name,
+        //     'birth_date' => $request->birth_date,
+        //     'gender' => $request->gender,
+        //     'user_id' => $user->id,
 
-        ]);
+        //]);
 
 
         // if ($request->has('country_code')) {
