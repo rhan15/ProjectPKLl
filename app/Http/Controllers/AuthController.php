@@ -26,19 +26,14 @@ class AuthController extends Controller
             ->where('phone_number', $request->phone_number)
             ->first();
 
-            // dd($user);
         if ($user) {
             $user->update([
                 'otp' => User::generateOTP(),
             ]);
             return $this->showOne($user);
+        } else {
+            // ! Need to handle when user not exist yet
         }
-        $user->update([
-                'otp' => User::generateOTP(),
-            ]);
-            return $this->showOne($user);
-
-        
     }
 
     public function verifyOtp(Request $request)
@@ -52,20 +47,23 @@ class AuthController extends Controller
         $this->validate($request, $rules);
 
         $user = User::where('phone_number', $request->phone_number)
-        ->where('otp', $request->otp)
-        ->first();
+            ->where('otp', $request->otp)
+            ->first();
 
         // dd($user);
-        if($user) {
+        if ($user) {
             Auth::login($user);
             $authUser = Auth::user();
             $tokenResult = $authUser->createToken('Personal Access Token', []);
+
+            // ! Need to handle whether it's new or old user
 
             return response()->json([
                 'token' => $tokenResult->accessToken,
             ]);
         }
 
+        // ! Need to handle when user not exist
     }
 
     public function register(Request $request)
@@ -97,7 +95,7 @@ class AuthController extends Controller
             'birth_date' => $request->birth_date,
             'gender' => $request->gender,
             'user_id' => $user->id,
-            
+
         ]);
 
 
@@ -107,10 +105,8 @@ class AuthController extends Controller
         //     ]);
         // }
 
-        
 
-        
+
+
     }
-
-    
 }
