@@ -18,12 +18,11 @@ class ProfileFactory extends Factory
      */
     public function definition()
     {
-        
         return [
             'name' => $this->faker->word(),
             'gender' => $gender = $this->faker->randomElement([Profile::GENDER_MALE, Profile::GENDER_FEMALE, Profile::GENDER_OTHER]),
             'birth_date' => $this->faker->date(),
-            'user_id' => User::inRandomOrder()->first()->id
+            'user_id' => $this->faker->unique()->numberBetween(1, User::count()),
         ];
     }
 }

@@ -17,11 +17,10 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
 
-            $table->string('phone_num')->unique();
-            $table->string('verified')->default(User::UNVERIFIED_USER);
+            $table->string('country_code');
+            $table->string('phone_number')->unique();
             $table->string('pin');
             $table->string('admin')->default(User::REGULAR_USER);
-            $table->string('access_token')->nullable();
             $table->string('otp')->nullable();
             
             $table->rememberToken();

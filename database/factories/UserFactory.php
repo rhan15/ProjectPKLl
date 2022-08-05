@@ -20,13 +20,11 @@ class UserFactory extends Factory
     {
         static $pin;
         return [
-            'phone_num' => str::random(12),
-            'verified' => $verified = $this->faker->randomElement([User::VERIFIED_USER, User::UNVERIFIED_USER]),
+            'country_code' => '62',
+            'phone_number' => mt_rand(100000000000, 999999999999),
             'pin' => $pin ?: $pin = bcrypt('secret'), // password
-            'admin' => $admin = $this->faker->randomElement([User::ADMIN_USER, User::REGULAR_USER]),
-            'access_token' => User::generateAccessToken(),
-            'otp' => $verified == User::VERIFIED_USER ? null : User::generateOTP(),
-
+            'admin' => $admin = User::REGULAR_USER,
+            'otp' => null,
             'remember_token' => Str::random(10),
         ];
     }

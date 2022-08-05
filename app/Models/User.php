@@ -6,8 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -25,11 +25,10 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'phone_num',
-        'verified',
+        'country_code',
+        'phone_number',
         'pin',
         'admin',
-        'access_token',
         'otp',
     ];
 
@@ -76,6 +75,6 @@ class User extends Authenticatable
 
     public static function generateOTP()
     {
-        return Str::random(6);
+        return mt_rand(100000, 999999);
     }
 }

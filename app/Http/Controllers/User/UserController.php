@@ -13,11 +13,11 @@ use Symfony\Contracts\Service\Attribute\Required;
 class UserController extends ApiController
 {
 
-    public function __construct()
-    {
-        $this->middleware('client.credentials')->only(['store','update']);
-        $this->middleware('auth:api')->except(['store','update']);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('client.credentials')->only(['store','update']);   
+    //     $this->middleware('auth:api')->except(['store','login','update']);
+    // }
     /**
      * Display a listing of the resource.
      *
@@ -41,19 +41,19 @@ class UserController extends ApiController
     public function store(Request $request, User $user)
     {
         $rules = [
-            'phone_num' => 'required|unique:users|min:9|max:13',
+            'country_code' => 'required|min:1',
+            'phone_number' => 'required|unique:users|min:9|max:13',
             'pin' => 'required|digits:6|confirmed'
         ];
 
         $this->validate($request, $rules);
         $data = $request->all();
 
-        $user = User::where('phone_num',request()->phone_num)->first();
+        $user = User::where('phone_number',request()->phone_number)->first();
 
 
-        // $checks = User::where($request->phone_num);
+        // $checks = User::where($request->phone_number);
         if ($user == null ) {
-            $data['verified'] = User::UNVERIFIED_USER;
             $data['pin'] = bcrypt($request->pin);
             $data['admin'] = User::REGULAR_USER;
             $data['access_token'] = User::generateAccessToken();
@@ -64,7 +64,7 @@ class UserController extends ApiController
 
             return $this->showOne($user, 201);
         }
-        // return $this->errorResponse('Nomor telephone telah terdaftar', 409);
+        return $this->errorResponse('Nomor telephone telah terdaftar', 409);
         
 
         // dd($user);
@@ -95,17 +95,16 @@ class UserController extends ApiController
     public function update(Request $request, User $user)
     {
         $rules = [
-            'phone_num' => 'unique:users|min:9|max:12',
+            'country_code' => 'required|min:1',
+            'phone_number' => 'unique:users|min:9|max:12',
             'pin' => 'digits:6|confirmed'
         ];
 
         $this->validate($request, $rules);
 
-        if ($request->has('phone_num') && $user->phone_num != $request->phone_num) {
-            $user->verified = User::UNVERIFIED_USER;
-            $user->access_token = User::generateAccessToken();
+        if ($request->has('phone_number') && $user->phone_number != $request->phone_number) {
             $user->otp = User::generateOTP();
-            $user->phone_num = $request->phone_num;
+            $user->phone_number = $request->phone_number;
         }
 
         if ($request->has('pin')) {
@@ -140,7 +139,7 @@ class UserController extends ApiController
     }
 
 
-    // $user = auth(->user()
+    // $user = auth()->user()
 
     // public function verify(Request $request, $token)
     // {
@@ -166,27 +165,30 @@ class UserController extends ApiController
 
     public function login(Request $request, User $user)
     {
+        dd('a');
         $rules = [
-            'phone_num' => 'required|min:9|max:13',
-            'pin' => 'required|digits:6',
+            'phone_number' => 'required|min:9|max:13',
+            'otp' => 'required|digits:6',
         ];
 
         $this->validate($request,$rules);
 
-        if (Auth::attempt(['phone_num' => $request->phone_num, 'pin' => $request->pin])) {
+        if (Auth::attempt(['phone_number' => $request->phone_number, 'otp' => $request->otp])) {
             $user = Auth::user();
 
-            if ($user->verified !=1) {
-                return response()->json([
-                    'messege' => 'Akun ini belum terferifikasi.'
-                ], 401);
-            }
+            dd($user);
+            // if ($user->verified !=1) {
+            //     return response()->json([
+            //         'messege' => 'Akun ini belum terferifikasi.'
+            //     ], 401);
+            // }
 
-            $token = $user->createToken($user->phone_num);
+            //$token = $user->createToken($user->phone_number);
+
+            
         }
-
         return response()->json([
-            'error' => "Credential salah"
+            'error' => "nomor belum terdaftar"
         ], 401);
 
     }
