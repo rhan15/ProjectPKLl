@@ -25,7 +25,7 @@ class UserController extends ApiController
      */
     public function index()
     {
-        
+
         $users = User::with('profile')->get();
 
         return $this->showAll($users);
@@ -49,26 +49,26 @@ class UserController extends ApiController
         $this->validate($request, $rules);
         $data = $request->all();
 
-        $user = User::where('phone_number',request()->phone_number)->first();
+        $user = User::where('phone_number', request()->phone_number)->first();
 
 
         // $checks = User::where($request->phone_number);
-        if ($user == null ) {
+        if ($user == null) {
             $data['pin'] = bcrypt($request->pin);
             $data['admin'] = User::REGULAR_USER;
-            
-        
+
+
 
             $user = User::create($data);
 
             return $this->showOne($user, 201);
         }
         return $this->errorResponse('Nomor telephone telah terdaftar', 409);
-        
+
 
         // dd($user);
-        
-        
+
+
 
 
     }
@@ -170,7 +170,7 @@ class UserController extends ApiController
             'otp' => 'required|digits:6',
         ];
 
-        $this->validate($request,$rules);
+        $this->validate($request, $rules);
 
         if (Auth::attempt(['phone_number' => $request->phone_number, 'otp' => $request->otp])) {
             $user = Auth::user();
@@ -184,12 +184,16 @@ class UserController extends ApiController
 
             //$token = $user->createToken($user->phone_number);
 
-            
+
         }
         return response()->json([
             'error' => "nomor belum terdaftar"
         ], 401);
-
     }
 
+    public function information()
+    {
+        // ! Ambil dari access token, cari si User,
+        // ! return informasi dari si pemilik token
+    }
 }
