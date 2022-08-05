@@ -42,7 +42,7 @@ class UserController extends ApiController
     {
         $rules = [
             'country_code' => 'required|min:1',
-            'phone_number' => 'required|unique:users|min:9|max:13',
+            'phone_number' => 'required|min:9|max:13',
             'pin' => 'required|digits:6|confirmed'
         ];
 
@@ -56,8 +56,7 @@ class UserController extends ApiController
         if ($user == null ) {
             $data['pin'] = bcrypt($request->pin);
             $data['admin'] = User::REGULAR_USER;
-            $data['access_token'] = User::generateAccessToken();
-            $data['otp'] = User::generateOTP();
+            
         
 
             $user = User::create($data);
