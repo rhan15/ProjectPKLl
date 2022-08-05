@@ -8,6 +8,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -97,6 +98,10 @@ class Handler extends ExceptionHandler
                 return $this->errorResponse("TIDAK DAPAT MENGHAPUS data ini permanen. data ini terkait dengan data yang lain", 409);
             }
 
+        }
+
+        if ($e instanceof TokenMismatchException) {
+            return redirect()->back()->withInput($request->input());
         }
 
         if(config('app.debug')) {

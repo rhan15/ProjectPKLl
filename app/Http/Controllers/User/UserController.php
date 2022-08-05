@@ -101,6 +101,10 @@ class UserController extends ApiController
 
         $this->validate($request, $rules);
 
+        if ($request->has('country_code')) {
+            $user->country_code = $request->country_code;
+        }
+
         if ($request->has('phone_number') && $user->phone_number != $request->phone_number) {
             $user->otp = User::generateOTP();
             $user->phone_number = $request->phone_number;
@@ -193,6 +197,14 @@ class UserController extends ApiController
 
     public function information()
     {
+        $user = auth()->user();
+        
+        return $this->showOne($user);
+
+        // $user = auth()->user();
+        
+        // return $this->showOne($user);
+
         // ! Ambil dari access token, cari si User,
         // ! return informasi dari si pemilik token
     }

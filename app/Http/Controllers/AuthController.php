@@ -40,7 +40,7 @@ class AuthController extends Controller
             $data['admin'] = User::REGULAR_USER;
             $data['otp'] = User::generateOTP();
 
-            // ! $userr = User::create($data);
+            // $userr = User::create($data);
 
             // $user->create($data);
             // return $this->showOne($user);
@@ -66,9 +66,9 @@ class AuthController extends Controller
 
         // dd($user);
 
-        if ($user->profile == null) {
-            return response('bisaaa');
-        }
+        // if ($user->profile == null) {
+        //     return response('bisaaa');
+        // }
 
         // $relation = $user->relation()->exists();
         // dd($relation);
@@ -88,10 +88,10 @@ class AuthController extends Controller
 
             // ! Need to handle whether it's new or old user
             $response['token'] =  $tokenResult->accessToken;
-            $response['is_new'] = false;
+            $response['is_new'] = true;
 
             if ($user->profile) {
-                $response['is_new'] = true;
+                $response['is_new'] = false;
             }
 
             return response()->json($response);
@@ -127,26 +127,48 @@ class AuthController extends Controller
         $data = $request->all();
 
         $user = auth()->user(); // gimana cara dapetin id usernya ko sedangkan usernya belum tebuat
-        auth()->id()
-        dd($user); // Object/Model User
-        $user->id; // Ini caranya
-        // $profile = Profile::create([
-        //     'name' => $request->name,
-        //     'birth_date' => $request->birth_date,
-        //     'gender' => $request->gender,
-        //     'user_id' => $user->id,
+        // auth()->id();
+        // dd($user); // Object/Model User
+        
+        $profile = Profile::create([
+            'name' => $request->name,
+            'birth_date' => $request->birth_date,
+            'gender' => $request->gender,
+            'user_id' => $user->id,
 
-        //]);
+        ]);
 
-
-        // if ($request->has('country_code')) {
-        //     $user->update([
-        //         'otp' => User::generateOTP(),
-        //     ]);
-        // }
+        return $this->showOne($profile);
 
 
 
 
+    }
+
+    public function forgetpassword(Request $request)
+    {
+        $rules = [
+            'otp' => 'required|digits:6',
+            'pin' => 'required|digits:6|confirmed'
+
+        ];
+
+        $this->validate($request, $rules);
+
+        $user = User::where('otp', $request->otp)
+            ->first();
+            // dd($user);
+
+        if ($user) {
+            $user->update([
+                'pin' => bcrypt($request->pin),
+            ]);
+            return $this->showOne($user);
+        } 
+        else {
+            return $this->errorResponse('otp not found', 404);
+           
+
+        }
     }
 }
