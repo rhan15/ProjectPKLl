@@ -127,7 +127,9 @@ class AuthController extends Controller
         $data = $request->all();
 
         $user = auth()->user(); // gimana cara dapetin id usernya ko sedangkan usernya belum tebuat
-        dd($user);
+        auth()->id()
+        dd($user); // Object/Model User
+        $user->id; // Ini caranya
         // $profile = Profile::create([
         //     'name' => $request->name,
         //     'birth_date' => $request->birth_date,
