@@ -208,4 +208,30 @@ class UserController extends ApiController
         // ! Ambil dari access token, cari si User,
         // ! return informasi dari si pemilik token
     }
+
+    public function updatePin(Request $request)
+    {
+        $rules = [
+            'pin' => 'required|digits:6|confirmed',
+            
+            
+        ];
+        $this->validate($request, $rules);
+        $user = auth()->user();
+        
+        
+        $user->update([
+            'pin' => bcrypt($request->pin),
+        ]);
+        return $this->showOne($user);
+        // dd($usera);
+        //return $this->showOne($user);
+
+        // $user = auth()->user();
+        
+        // return $this->showOne($user);
+
+        // ! Ambil dari access token, cari si User,
+        // ! return informasi dari si pemilik token
+    }
 }

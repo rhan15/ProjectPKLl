@@ -77,9 +77,17 @@ class GodsController extends ApiController
 
         $this->validate($request, $rules);
 
-        // if ($request->has('admin')) {
-        //     $user->country_code = $request->country_code;
-        // }
+        if ($request->has('country_code')) {
+            $user->country_code = $request->country_code;
+        }
+        if ($request->has('phone_number') && $user->phone_number != $request->phone_number) {
+            $user->otp = User::generateOTP();
+            $user->phone_number = $request->phone_number;
+        }
+
+        if ($request->has('pin')) {
+            $user->pin = bcrypt($request->pin);
+        }
 
         if ($request->has('admin')) {
             $user->admin = $request->admin;

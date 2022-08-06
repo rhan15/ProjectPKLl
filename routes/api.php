@@ -26,6 +26,7 @@ use Spatie\FlareClient\Api;
 
 Route::prefix('me')->group(function () {
     Route::get('information', [UserController::class, 'information'])->middleware('auth:api');
+    Route::post('updatepin', [UserController::class, 'updatePin'])->middleware('auth:api');
 });
 
 Route::prefix('user')->group(function () {
@@ -41,6 +42,8 @@ Route::prefix('auth')->group(function () {
     Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('register', [AuthController::class, 'register'])->middleware('auth:api'); // ! kurang middleware auth:api
     Route::post('forgetpassword', [AuthController::class, 'forgetpassword']);
+    Route::post('updateadmin', [AuthController::class, 'updateadmin']);
+    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');
 });
 
 

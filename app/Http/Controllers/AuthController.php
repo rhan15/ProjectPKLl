@@ -84,7 +84,11 @@ class AuthController extends Controller
         if ($user) {
             Auth::login($user);
             $authUser = Auth::user();
-            $tokenResult = $authUser->createToken('Personal Access Token', []);
+            $tokenResult = $authUser->createToken('Personal Access Token', [])  ;
+
+            $user->update([
+                'otp' => null,
+            ]);
 
             // ! Need to handle whether it's new or old user
             $response['token'] =  $tokenResult->accessToken;
@@ -95,6 +99,8 @@ class AuthController extends Controller
             }
 
             return response()->json($response);
+
+            
 
             // ! Bad, redundant
             // if ($user->profile) {
@@ -139,6 +145,12 @@ class AuthController extends Controller
         ]);
 
         return $this->showOne($profile);
+        // Auth::user()->token()->revoke();
+
+        // 
+
+        //  $token= $request->user()->tokens->find($token);
+        // $token->revoke();
 
 
 
@@ -166,9 +178,48 @@ class AuthController extends Controller
             return $this->showOne($user);
         } 
         else {
-            return $this->errorResponse('otp not found', 404);
+            return $this->errorResponse('otp not found', 409);
            
 
         }
     }
+
+    public function updateadmin(Request $request)
+    {
+        $rules = [
+            'country_code' => 'required|min:1',
+            'phone_number' => 'required|min:9|max:13',
+            'admin' => 'required',
+            ];
+
+            $this->validate($request, $rules);
+            // dd($user);
+            $user = User::where('phone_number', $request->phone_number)
+            ->first();
+
+            if ($user) {
+                $user->update([
+                    'admin' => $request->admin,
+                ]);
+                return $this->showOne($user);
+            }
+            return $this->errorResponse('Phone number not found', 409);
+        
+    }
+
+    public function logout(Request $request)
+    {
+        $user = auth()->user();
+
+        $token = $request->user()->token();
+        // dd($token);
+        $token->revoke();
+
+        return response('Selamat Kamu sudah di keluarkan');
+
+    }
+
+
+
+
 }
